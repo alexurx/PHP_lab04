@@ -1,0 +1,78 @@
+/* Стили для страниц с рецептами */
+.recipe {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.recipe h2 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.tags {
+    margin: 15px 0;
+}
+
+.tag {
+    display: inline-block;
+    background: #e0e0e0;
+    padding: 3px 8px;
+    margin-right: 5px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    color: #555;
+}
+
+.error {
+    color: #e74c3c;
+    font-size: 0.9em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+.pagination {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.pagination a:hover {
+    background: #eee;
+}
