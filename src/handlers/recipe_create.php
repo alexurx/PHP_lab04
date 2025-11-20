@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../helpers.php';
 
-// Фильтрация данных
 $data = [
     'title' => sanitize($_POST['title'] ?? ''),
     'category' => sanitize($_POST['category'] ?? ''),
@@ -12,43 +11,33 @@ $data = [
     'created_at' => date('Y-m-d H:i:s')
 ];
 
-// Валидация
 $errors = [];
 
-if (empty($data['title'])) {
-    $errors['title'] = 'Название рецепта обязательно';
-} elseif (strlen($data['title']) > 255) {
-    $errors['title'] = 'Название не должно превышать 255 символов';
-}
-
+if (empty($data['title'])) $errors['title'] = 'Название рецепта обязательно';
+elseif (strlen($data['title']) > 255) $errors['title'] = 'Название не должно превышать 255 символов';
 if (empty($data['category'])) $errors['category'] = 'Категория обязательна';
 if (empty($data['ingredients'])) $errors['ingredients'] = 'Ингредиенты обязательны';
 if (empty($data['description'])) $errors['description'] = 'Описание обязательно';
 
-$validSteps = array_filter($data['steps'], fn($s) => !empty(trim($s)));
-if (empty($validSteps)) {
-    $errors['steps'] = 'Добавьте хотя бы один шаг приготовления';
-} else {
-    $data['steps'] = $validSteps;
-}
+$validSteps = array_filter($data['steps'], fn($step) => !empty(trim($step)));
+if (empty($validSteps)) $errors['steps'] = 'Добавьте хотя бы один шаг приготовления';
+else $data['steps'] = $validSteps;
 
-// Если есть ошибки, возвращаемся на форму
 if (!empty($errors)) return;
 
-// Сохраняем в RDS
-$pdo = getDbConnection();
-$stmt = $pdo->prepare("
-    INSERT INTO recipes (title, category, ingredients, description, tags, steps, created_at)
-    VALUES (:title, :category, :ingredients, :description, :tags, :steps, :created_at)
-");
+// Сохранение в базу данных
+global $pdo;
+
+$stmt = $pdo->prepare("INSERT INTO recipes (title, category, ingredients, description, tags, steps, created_at)
+                       VALUES (:title, :category, :ingredients, :description, :tags, :steps, :created_at)");
 
 $stmt->execute([
     ':title' => $data['title'],
     ':category' => $data['category'],
     ':ingredients' => $data['ingredients'],
     ':description' => $data['description'],
-    ':tags' => json_encode($data['tags']),
-    ':steps' => json_encode($data['steps']),
+    ':tags' => json_encode($data['tags'], JSON_UNESCAPED_UNICODE),
+    ':steps' => json_encode($data['steps'], JSON_UNESCAPED_UNICODE),
     ':created_at' => $data['created_at']
 ]);
 
