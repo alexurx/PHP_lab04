@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 
 /**
  * Проверяет, есть ли ошибка для указанного поля
@@ -20,7 +20,7 @@ function getError(string $field): string
 }
 
 /**
- * Возвращает старое значение поля или значение по умолчанию
+ * Возвращает старое значение поля
  */
 function old(string $field, $default = '')
 {
@@ -44,33 +44,16 @@ function sanitize($data)
     if (is_array($data)) {
         return array_map('sanitize', $data);
     }
+    
     return htmlspecialchars(trim($data));
 }
 
 /**
- * Получение PDO-соединения с RDS
+ * Читает все рецепты из базы данных
  */
-function getDbConnection(): PDO {
-    static $pdo;
-    if (!$pdo) {
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
-        ]);
-    }
-    return $pdo;
-}
-
-/**
- * Чтение всех рецептов из базы данных
- */
-function readRecipes(): array {
-    $pdo = getDbConnection();
+function readRecipes(): array
+{
+    global $pdo;
     $stmt = $pdo->query("SELECT * FROM recipes ORDER BY created_at DESC");
-    return $stmt->fetchAll(PDO::FETCH_OBJ);
+    return $stmt->fetchAll();
 }
-
-    return $recipes;
-}
-
