@@ -1,9 +1,8 @@
 <?php
+require_once __DIR__ . '/config.php';
+
 /**
  * Проверяет, есть ли ошибка для указанного поля
- * 
- * @param string $field Имя поля
- * @return bool
  */
 function hasError(string $field): bool
 {
@@ -13,9 +12,6 @@ function hasError(string $field): bool
 
 /**
  * Возвращает текст ошибки для указанного поля
- * 
- * @param string $field Имя поля
- * @return string
  */
 function getError(string $field): string
 {
@@ -25,10 +21,6 @@ function getError(string $field): string
 
 /**
  * Возвращает старое значение поля или значение по умолчанию
- * 
- * @param string $field Имя поля
- * @param mixed $default Значение по умолчанию
- * @return mixed
  */
 function old(string $field, $default = '')
 {
@@ -37,8 +29,6 @@ function old(string $field, $default = '')
 
 /**
  * Перенаправляет на указанный URL
- * 
- * @param string $url URL для перенаправления
  */
 function redirect(string $url)
 {
@@ -48,32 +38,43 @@ function redirect(string $url)
 
 /**
  * Фильтрует и очищает входные данные
- * 
- * @param mixed $data Входные данные
- * @return mixed Очищенные данные
  */
 function sanitize($data)
 {
     if (is_array($data)) {
         return array_map('sanitize', $data);
     }
-    
     return htmlspecialchars(trim($data));
 }
 
 /**
- * Читает все рецепты из файла
- * 
- * @return array Массив рецептов
+ * Получение PDO-соединения с RDS
  */
-function readRecipes(): array
-{
-    $filename = __DIR__ . '/../storage/recipes.txt';
-    if (!file_exists($filename)) {
-        return [];
+function getDbConnection(): PDO {
+    static $pdo;
+    if (!$pdo) {
+        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
+        ]);
     }
-    
-    $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    return array_map('json_decode', $lines);
+    return $pdo;
 }
 
+/**
+ * Чтение всех рецептов из базы данных
+ */
+function readRecipes(): array {
+    $pdo = getDbConnection();
+    $stmt = $pdo->query("SELECT * FROM recipes ORDER BY created_at DESC");
+    $recipes = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    // Декодируем JSON поля tags и steps
+    foreach ($recipes as $r) {
+        $r->tags = json_decode($r->tags, true) ?? [];
+        $r->steps = json_decode($r->steps, true) ?? [];
+    }
+
+    return $recipes;
+}
