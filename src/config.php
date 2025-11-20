@@ -1,6 +1,7 @@
 <?php
-// Конфигурация подключения к базе данных RDS
-define('DB_HOST', '<RDS_ENDPOINT>'); // Замените на ваш endpoint RDS
-define('DB_NAME', 'recipe_db');      // Название базы данных
-define('DB_USER', 'admin');          // Пользователь RDS
-define('DB_PASS', '<RDS_PASSWORD>'); // Пароль
+// Настройки подключения к базе данных RDS
+define('DB_HOST', 'project-rds-mysql-prod.<region>.rds.amazonaws.com'); // замените <region> на ваш регион
+define('DB_NAME', 'project_db');
+define('DB_USER', 'admin'); // имя пользователя RDS
+define('DB_PASS', 'YourPassword123'); // пароль RDS
+define('DB_CHARSET', 'utf8mb4'); // кодировка
