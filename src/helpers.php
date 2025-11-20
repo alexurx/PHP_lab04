@@ -68,13 +68,9 @@ function getDbConnection(): PDO {
 function readRecipes(): array {
     $pdo = getDbConnection();
     $stmt = $pdo->query("SELECT * FROM recipes ORDER BY created_at DESC");
-    $recipes = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-    // Декодируем JSON поля tags и steps
-    foreach ($recipes as $r) {
-        $r->tags = json_decode($r->tags, true) ?? [];
-        $r->steps = json_decode($r->steps, true) ?? [];
-    }
+    return $stmt->fetchAll(PDO::FETCH_OBJ);
+}
 
     return $recipes;
 }
+
